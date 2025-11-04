@@ -157,6 +157,150 @@
         "date_selector": "time",
         "summary_selector": "div.intro"
       }
+    },
+    {
+      "name": "TechWeb",
+      "url": "https://www.techweb.com.cn",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "科技新闻资讯平台，覆盖互联网、通信、数码等领域",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.techweb.com.cn/",
+        "encoding": "utf-8",
+        "article_container": "div.news_title",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span.time",
+        "summary_selector": "div.news_content"
+      }
+    },
+    {
+      "name": "DTDATA",
+      "url": "http://www.dtdata.cn",
+      "tier": 1,
+      "active": true,
+      "category": "数据中心/云计算",
+      "description": "数据中心技术资讯平台，专注数据中心建设、运维和技术创新",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.dtdata.cn/",
+        "encoding": "utf-8",
+        "article_container": "li",
+        "title_selector": "h4.uk-margin-remove a",
+        "link_selector": "h4.uk-margin-remove a",
+        "date_selector": "p.uk-text-meta",
+        "summary_selector": "p"
+      }
+    },
+    {
+      "name": "IT之家",
+      "url": "https://www.ithome.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "IT科技资讯门户，覆盖互联网、通信、数码等科技领域",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.ithome.com/",
+        "encoding": "utf-8",
+        "article_container": "div",
+        "title_selector": "h2 a, h3 a, .title a",
+        "link_selector": "a",
+        "date_selector": ".time, .date",
+        "summary_selector": ".desc, .summary"
+      }
+    },
+    {
+      "name": "驱动之家",
+      "url": "https://www.mydrivers.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "科技硬件资讯平台，关注IT硬件、数码产品和科技新闻",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.mydrivers.com/",
+        "encoding": "gbk",
+        "article_container": "li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".time, span",
+        "summary_selector": ".desc"
+      }
+    },
+    {
+      "name": "新浪科技",
+      "url": "https://tech.sina.com.cn",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "新浪科技频道，综合科技新闻和行业资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://tech.sina.com.cn/",
+        "encoding": "utf-8",
+        "article_container": "li, div",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".time, .date",
+        "summary_selector": "p"
+      }
+    },
+    {
+      "name": "腾讯科技",
+      "url": "https://tech.qq.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "腾讯科技频道，覆盖互联网、通信、AI等领域",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://tech.qq.com/",
+        "encoding": "utf-8",
+        "article_container": "div",
+        "title_selector": "a.article-title, h3 a, h2 a",
+        "link_selector": "a",
+        "date_selector": ".time, .date",
+        "summary_selector": ".desc"
+      }
+    },
+    {
+      "name": "网易科技",
+      "url": "https://tech.163.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "网易科技频道，提供科技新闻和深度报道",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://tech.163.com/",
+        "encoding": "gbk",
+        "article_container": "li, div",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".time, .date",
+        "summary_selector": "p"
+      }
+    },
+    {
+      "name": "搜狐科技",
+      "url": "https://it.sohu.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "搜狐科技频道，关注互联网和科技行业动态",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://it.sohu.com/",
+        "encoding": "utf-8",
+        "article_container": "li, div",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".time, .date",
+        "summary_selector": ".desc"
+      }
     }
   ],
   "metadata": {
