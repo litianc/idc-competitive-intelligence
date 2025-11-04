@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(idc-marketing-analysis)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "极客公园": {
+    "name": "极客公园",
+    "url": "https://www.geekpark.net/",
+    "status": "success",
+    "recommendations": {
+      "list_url": "https://www.geekpark.net/",
+      "encoding": "utf-8",
+      "article_container": "[class*='article']",
+      "title_selector": "TODO - check article structure",
+      "link_selector": "a",
+      "date_selector": "[class*='time']"
+    },
+    "article_count": 41,
+    "containers_found": [
+      "[class*='article']",
+      "[class*='item']",
+      "article",
+      "[class*='news']",
+      ".item"
+    ]
+  },
+  "云头条": {
+    "name": "云头条",
+    "url": "https://www.yuntoutiao.com/",
+    "status": "success",
+    "recommendations": {
+      "list_url": "https://www.yuntoutiao.com/",
+      "encoding": "utf-8",
+      "article_container": "article",
+      "title_selector": "TODO - check article structure",
+      "link_selector": "a",
+      "date_selector": "span.date"
+    },
+    "article_count": 17,
+    "containers_found": [
+      "article",
+      ".item",
+      "[class*='item']",
+      "[class*='news']"
+    ]
+  }
+}

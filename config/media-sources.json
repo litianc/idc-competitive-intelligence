@@ -1,0 +1,210 @@
+{
+  "sources": [
+    {
+      "name": "中国IDC圈",
+      "url": "https://news.idcquan.com",
+      "tier": 1,
+      "active": true,
+      "category": "数据中心/云计算",
+      "description": "中国最权威的IDC行业垂直媒体，覆盖数据中心、云计算、AI算力等全产业链资讯",
+      "scraper_config": {
+        "scraper_type": "custom",
+        "list_url": "https://news.idcquan.com/",
+        "encoding": "utf-8",
+        "article_container": "div.news.clearfix",
+        "title_selector": "div.news_nr span.title",
+        "link_selector": "a.bdurl",
+        "date_selector": "span.date",
+        "summary_selector": "div.news_nr div.d2 span.nei_rong",
+        "date_format": "%Y-%m-%d %H:%M:%S"
+      }
+    },
+
+    {
+      "name": "36氪",
+      "url": "https://36kr.com",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "科技创投媒体，覆盖创业投资、科技资讯、融资并购等",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://36kr.com/newsflashes",
+        "encoding": "utf-8",
+        "article_container": "div.newsflash-item",
+        "title_selector": "a.item-title",
+        "link_selector": "a.item-title",
+        "date_selector": "span.time",
+        "summary_selector": "div.item-desc span"
+      }
+    },
+
+    {
+      "name": "InfoQ",
+      "url": "https://www.infoq.cn",
+      "tier": 2,
+      "active": true,
+      "category": "科技资讯",
+      "description": "软件开发和技术资讯，深度技术内容",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.infoq.cn/topic/cloud-computing",
+        "encoding": "utf-8",
+        "article_container": "div.article-item",
+        "title_selector": "h6 a",
+        "link_selector": "h6 a",
+        "date_selector": "div.date",
+        "summary_selector": "p.summary"
+      }
+    },
+
+    {
+      "name": "量子位",
+      "url": "https://www.qbitai.com",
+      "tier": 2,
+      "active": true,
+      "category": "AI/大模型",
+      "description": "AI和前沿科技资讯，关注人工智能、机器学习等",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.qbitai.com/",
+        "encoding": "utf-8",
+        "article_container": ".picture_text",
+        "title_selector": "h4 a",
+        "link_selector": "h4 a",
+        "date_selector": ".time",
+        "summary_selector": "p"
+      }
+    },
+    {
+      "name": "数据中心世界",
+      "url": "https://www.dcworld.cn",
+      "tier": 1,
+      "active": true,
+      "description": "专注数据中心技术、运维、建设的专业媒体，深度报道行业技术进展和最佳实践",
+      "scraper_config": {
+        "scraper_type": "basic",
+        "list_url": "https://www.dcworld.cn/news/",
+        "encoding": "utf-8",
+        "article_selector": ".article-list .article-item",
+        "title_selector": "h3 a",
+        "link_selector": "h3 a",
+        "date_selector": ".publish-date",
+        "date_format": "%Y-%m-%d",
+        "date_patterns": [
+          "\\d{4}-\\d{2}-\\d{2}",
+          "\\d{4}年\\d{1,2}月\\d{1,2}日"
+        ],
+        "content_selector": ".content-body",
+        "request_delay": [2, 5]
+      }
+    },
+    {
+      "name": "通信世界网",
+      "url": "https://www.cww.net.cn",
+      "tier": 2,
+      "active": true,
+      "description": "通信行业综合媒体，覆盖IDC、云计算、5G、数据中心等领域，政策解读深入",
+      "scraper_config": {
+        "scraper_type": "basic",
+        "list_url": "https://www.cww.net.cn/channel/datacenter/",
+        "encoding": "gbk",
+        "article_selector": ".news-list li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".date",
+        "date_format": "%Y-%m-%d",
+        "date_patterns": [
+          "\\d{4}-\\d{2}-\\d{2}",
+          "\\d{2}-\\d{2}"
+        ],
+        "content_selector": ".article-content",
+        "request_delay": [3, 6]
+      }
+    },
+    {
+      "name": "极客公园",
+      "url": "https://www.geekpark.net",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技产品和创新媒体，关注前沿科技、AI、新造车等领域，内容深度好",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.geekpark.net/",
+        "encoding": "utf-8",
+        "article_container": "article.article-item",
+        "title_selector": "h3 a",
+        "link_selector": "h3 a",
+        "date_selector": "div.article-time",
+        "summary_selector": "p.multiline-text-overflow"
+      }
+    },
+    {
+      "name": "云头条",
+      "url": "https://www.yuntoutiao.com",
+      "tier": 1,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "云计算资讯专业媒体，聚焦云计算、数据中心、IDC行业动态和政策解读",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.yuntoutiao.com/",
+        "encoding": "utf-8",
+        "article_container": "article.item",
+        "title_selector": "h2 a",
+        "link_selector": "h2 a",
+        "date_selector": "time",
+        "summary_selector": "div.intro"
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-01-03",
+    "total_sources": 3,
+    "notes": [
+      "初始配置包含3个核心媒体源，用于MVP验证",
+      "CSS选择器需要根据实际网站结构调整",
+      "date_patterns支持多种日期格式的正则匹配",
+      "request_delay为随机延迟范围（秒），避免频繁请求"
+    ]
+  },
+  "tier_definitions": {
+    "1": {
+      "name": "Tier 1 - 权威媒体",
+      "credibility_score": 15,
+      "description": "行业垂直媒体，内容权威，更新及时，覆盖全面"
+    },
+    "2": {
+      "name": "Tier 2 - 专业媒体",
+      "credibility_score": 8,
+      "description": "综合科技/通信媒体的IDC频道，内容专业，覆盖较广"
+    },
+    "3": {
+      "name": "Tier 3 - 一般媒体",
+      "credibility_score": 3,
+      "description": "一般科技媒体或行业网站，内容相关但深度有限"
+    }
+  },
+  "expansion_candidates": [
+    {
+      "name": "36氪-企业服务频道",
+      "url": "https://36kr.com/channel/enterprise",
+      "tier": 2,
+      "reason": "覆盖云计算和IDC企业的融资、并购等投资动态"
+    },
+    {
+      "name": "钛媒体-云计算频道",
+      "url": "https://www.tmtpost.com/channel/cloud",
+      "tier": 2,
+      "reason": "科技媒体，关注云计算和数据中心的商业模式和市场趋势"
+    },
+    {
+      "name": "雷锋网-云计算频道",
+      "url": "https://www.leiphone.com/category/cloudcomputing",
+      "tier": 2,
+      "reason": "技术深度报道，覆盖AI算力、智算中心等前沿话题"
+    }
+  ]
+}

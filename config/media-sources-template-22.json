@@ -1,0 +1,443 @@
+{
+  "sources": [
+    {
+      "name": "中国IDC圈",
+      "url": "https://news.idcquan.com",
+      "tier": 1,
+      "active": true,
+      "category": "数据中心/云计算",
+      "description": "数据中心行业权威媒体",
+      "scraper_config": {
+        "scraper_type": "custom",
+        "list_url": "https://news.idcquan.com/",
+        "article_container": "div.news.clearfix",
+        "title_selector": "div.news_nr span.title",
+        "link_selector": "a.bdurl",
+        "date_selector": "span.date",
+        "summary_selector": "div.news_nr div.d2 span.nei_rong",
+        "date_format": "%Y-%m-%d %H:%M:%S"
+      }
+    },
+
+    {
+      "name": "36氪",
+      "url": "https://36kr.com",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技创投媒体，覆盖创业、投资、科技资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://36kr.com/newsflashes",
+        "article_container": "TODO_需要分析网站",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置：需运行 python tmp/analyze_website.py https://36kr.com"
+    },
+
+    {
+      "name": "极客公园",
+      "url": "https://www.geekpark.net",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技产品和创新资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.geekpark.net/news",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "InfoQ",
+      "url": "https://www.infoq.cn",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "软件开发和技术资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.infoq.cn/topic/cloud-computing",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "钛媒体",
+      "url": "https://www.tmtpost.com",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技商业媒体",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.tmtpost.com/channel/cloud",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "TechWeb",
+      "url": "https://www.techweb.com.cn",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技新闻资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.techweb.com.cn/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "量子位",
+      "url": "https://www.qbitai.com",
+      "tier": 2,
+      "active": false,
+      "category": "AI/大模型",
+      "description": "AI和前沿科技资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.qbitai.com/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "特大牛",
+      "url": "https://tedaniu.com",
+      "tier": 2,
+      "active": false,
+      "category": "科技资讯",
+      "description": "科技行业分析",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://tedaniu.com/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "DeepSeek",
+      "url": "https://www.deepseek.com",
+      "tier": 1,
+      "active": false,
+      "category": "AI/大模型",
+      "description": "DeepSeek官方资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.deepseek.com/news",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 可能需要RSS或公众号"
+    },
+
+    {
+      "name": "智谱AI",
+      "url": "https://www.zhipuai.cn",
+      "tier": 1,
+      "active": false,
+      "category": "AI/大模型",
+      "description": "智谱AI官方资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.zhipuai.cn/news",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 可能需要RSS或公众号"
+    },
+
+    {
+      "name": "普世量子",
+      "url": "TODO_需要确认URL",
+      "tier": 2,
+      "active": false,
+      "category": "AI/大模型",
+      "description": "量子计算资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "TODO",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 需确认官方网站URL"
+    },
+
+    {
+      "name": "CDCC",
+      "url": "http://www.cdcc.org.cn",
+      "tier": 1,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "中国数据中心工作组",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.cdcc.org.cn/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "中国算力大会",
+      "url": "TODO_需要确认URL",
+      "tier": 1,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "算力产业大会官方",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "TODO",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 需确认官方网站URL"
+    },
+
+    {
+      "name": "DTDATA",
+      "url": "http://www.dtdata.cn",
+      "tier": 1,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "数据中心技术资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.dtdata.cn/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "云头条",
+      "url": "https://www.yuntoutiao.com",
+      "tier": 2,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "云计算资讯平台",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.yuntoutiao.com/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "润泽科技",
+      "url": "http://www.rccdc.com",
+      "tier": 2,
+      "active": false,
+      "category": "数据中心/云计算",
+      "description": "数据中心运营商官方",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.rccdc.com/news/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "Saasverse",
+      "url": "https://saasverse.cn",
+      "tier": 2,
+      "active": false,
+      "category": "投资/商业",
+      "description": "SaaS行业投资分析",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://saasverse.cn/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "Founder Park",
+      "url": "https://founderpark.com",
+      "tier": 2,
+      "active": false,
+      "category": "投资/商业",
+      "description": "创业投资资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://founderpark.com/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "解读REITs",
+      "url": "TODO_需要确认URL",
+      "tier": 3,
+      "active": false,
+      "category": "投资/商业",
+      "description": "房地产投资信托分析",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "TODO",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 需确认官方网站URL"
+    },
+
+    {
+      "name": "中国新闻网",
+      "url": "http://www.chinanews.com.cn",
+      "tier": 3,
+      "active": false,
+      "category": "综合资讯",
+      "description": "官方新闻媒体",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.chinanews.com.cn/it/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 建议只采集IT/科技频道"
+    },
+
+    {
+      "name": "中国信息安全",
+      "url": "http://www.cismag.com.cn",
+      "tier": 2,
+      "active": false,
+      "category": "综合资讯",
+      "description": "信息安全行业资讯",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.cismag.com.cn/",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置"
+    },
+
+    {
+      "name": "WMedia Global",
+      "url": "TODO_需要确认URL",
+      "tier": 2,
+      "active": false,
+      "category": "综合资讯",
+      "description": "全球科技媒体平台",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "TODO",
+        "article_container": "TODO",
+        "title_selector": "TODO",
+        "link_selector": "TODO",
+        "date_selector": "TODO"
+      },
+      "notes": "待配置 - 需确认官方网站URL"
+    }
+  ],
+
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2025-11-03",
+    "total_sources": 22,
+    "active_sources": 1,
+    "pending_configuration": 21,
+    "notes": [
+      "配置模板：22个媒体源",
+      "当前只有IDC圈配置完成并激活",
+      "其他媒体待配置CSS选择器",
+      "使用 python tmp/analyze_website.py <URL> 分析网站结构",
+      "配置完成后将 active 设置为 true"
+    ]
+  },
+
+  "configuration_guide": {
+    "step1": "选择要添加的媒体",
+    "step2": "运行分析工具: python tmp/analyze_website.py <URL>",
+    "step3": "更新该媒体的 scraper_config 字段",
+    "step4": "将 active 设置为 true",
+    "step5": "测试: python tmp/test_generic_scraper.py",
+    "documentation": "docs/ADD_NEW_MEDIA.md"
+  },
+
+  "priority_recommendations": {
+    "high_priority": [
+      "36氪 - 投资动态",
+      "InfoQ - 技术深度",
+      "量子位 - AI前沿",
+      "钛媒体 - 商业分析"
+    ],
+    "medium_priority": [
+      "极客公园",
+      "TechWeb",
+      "CDCC",
+      "云头条"
+    ],
+    "low_priority": [
+      "中国新闻网 - 信息噪音较大",
+      "WMedia Global - 需确认URL"
+    ]
+  }
+}

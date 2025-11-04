@@ -1,0 +1,158 @@
+# IDC竞争情报系统 - Git忽略文件配置
+
+# ============================================================================
+# Python
+# ============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================================================
+# 环境配置和敏感信息
+# ============================================================================
+
+# 环境变量文件（包含API密钥等敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 虚拟环境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# ============================================================================
+# 数据和输出文件
+# ============================================================================
+
+# 生产数据库（保留示例数据库）
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# 临时数据库（保留测试数据库用于示例）
+# tmp/*.db
+
+# 生成的报告（可根据需求调整）
+reports/*.md
+reports/*.pdf
+reports/*.html
+
+# 日志文件
+*.log
+logs/
+
+# ============================================================================
+# IDE和编辑器配置
+# ============================================================================
+
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# PyCharm
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# 操作系统
+# ============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# 项目特定
+# ============================================================================
+
+# Playwright浏览器缓存
+.playwright/
+
+# 缓存文件
+*.cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# 备份文件
+*.bak
+*.backup
+*.old
+*.tmp
+
+# ============================================================================
+# 说明
+# ============================================================================
+
+# 本配置说明：
+# 1. .env 文件包含敏感信息（API密钥），必须忽略
+# 2. 数据库文件建议忽略（较大）
+# 3. tmp/目录的测试数据库保留用于示例
+# 4. __pycache__ 和 *.pyc 是Python编译缓存，必须忽略
