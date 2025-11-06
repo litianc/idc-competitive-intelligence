@@ -69,6 +69,14 @@ class Database:
                 score_impact INTEGER DEFAULT 0,
                 score_credibility INTEGER DEFAULT 0,
 
+                -- LLM智能评分
+                llm_relevance_score INTEGER DEFAULT 0,
+                llm_importance_score INTEGER DEFAULT 0,
+                llm_category_score INTEGER DEFAULT 0,
+                llm_total_score INTEGER DEFAULT 0,
+                llm_category_suggestion TEXT,
+                llm_reason TEXT,
+
                 -- 质量标记
                 link_valid BOOLEAN DEFAULT 1,
                 summary_generated BOOLEAN DEFAULT 0,
@@ -130,6 +138,12 @@ class Database:
         score_timeliness: int = 0,
         score_impact: int = 0,
         score_credibility: int = 0,
+        llm_relevance_score: int = 0,
+        llm_importance_score: int = 0,
+        llm_category_score: int = 0,
+        llm_total_score: int = 0,
+        llm_category_suggestion: Optional[str] = None,
+        llm_reason: Optional[str] = None,
         link_valid: bool = True,
     ) -> Optional[int]:
         """
@@ -150,6 +164,12 @@ class Database:
             score_timeliness: 时效性评分（可选）
             score_impact: 影响范围评分（可选）
             score_credibility: 来源可信度评分（可选）
+            llm_relevance_score: LLM相关性评分（可选，0-20分）
+            llm_importance_score: LLM重要性评分（可选，0-20分）
+            llm_category_score: LLM分类置信度（可选，0-10分）
+            llm_total_score: LLM总分（可选，0-50分）
+            llm_category_suggestion: LLM建议的分类（可选）
+            llm_reason: LLM判断理由（可选）
             link_valid: 链接是否有效
 
         Returns:
@@ -168,8 +188,10 @@ class Database:
                     publish_date, content, summary,
                     category, priority, score,
                     score_relevance, score_timeliness, score_impact, score_credibility,
+                    llm_relevance_score, llm_importance_score, llm_category_score, llm_total_score,
+                    llm_category_suggestion, llm_reason,
                     link_valid, summary_generated
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     title,
@@ -187,6 +209,12 @@ class Database:
                     score_timeliness,
                     score_impact,
                     score_credibility,
+                    llm_relevance_score,
+                    llm_importance_score,
+                    llm_category_score,
+                    llm_total_score,
+                    llm_category_suggestion,
+                    llm_reason,
                     1 if link_valid else 0,
                     1 if summary else 0,
                 ),
@@ -484,6 +512,23 @@ class Database:
 
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
+
+    def clear_all_articles(self):
+        """清空所有历史文章数据"""
+        cursor = self.conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM articles")
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name='articles'")
+            self.conn.commit()
+
+            # 执行VACUUM优化数据库文件大小
+            cursor.execute("VACUUM")
+
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            raise e
 
     def close(self):
         """关闭数据库连接"""
