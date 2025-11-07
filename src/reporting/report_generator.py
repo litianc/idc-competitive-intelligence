@@ -101,12 +101,15 @@ class WeeklyReportGenerator:
         # 生成报告
         report = self._generate_header()
 
-        # 生成各个章节
-        report += self._generate_investment_section(by_category, by_priority)
-        report += self._generate_technology_section(by_category, by_priority)
-        report += self._generate_policy_section(by_category, by_priority)
-        report += self._generate_market_section(by_category, by_priority)
-        report += self._generate_other_section(by_category, by_priority)
+        # 跟踪已展示的文章URL（避免重复）
+        displayed_urls = set()
+
+        # 生成各个章节（政策章节优先，避免被其他章节消费）
+        report += self._generate_policy_section(by_category, by_priority, displayed_urls)
+        report += self._generate_investment_section(by_category, by_priority, displayed_urls)
+        report += self._generate_technology_section(by_category, by_priority, displayed_urls)
+        report += self._generate_market_section(by_category, by_priority, displayed_urls)
+        report += self._generate_other_section(by_category, by_priority, displayed_urls)
 
         # 生成统计信息
         report += self._generate_statistics(articles)
@@ -130,28 +133,37 @@ class WeeklyReportGenerator:
         return header
 
     def _generate_investment_section(
-        self, by_category: Dict, by_priority: Dict
+        self, by_category: Dict, by_priority: Dict, displayed_urls: set
     ) -> str:
         """生成投资动态章节"""
-        section = "## 一、投资动态\n\n"
+        section = "## 二、投资动态\n\n"
 
-        # 获取投资类高优先级文章
-        investment_articles = by_category.get("投资", [])
+        # 获取投资类高优先级文章（支持多分类，如"投资,技术"）
+        investment_articles = []
+        for category, articles in by_category.items():
+            if "投资" in category:
+                investment_articles.extend(articles)
+
+        # 过滤已展示的文章
         high_priority_investments = [
-            a for a in investment_articles if a.get("priority") == "高"
+            a for a in investment_articles
+            if a.get("priority") == "高" and a.get("url") not in displayed_urls
         ]
 
         if high_priority_investments:
             for i, article in enumerate(high_priority_investments, 1):
                 section += self._format_article(i, article)
+                displayed_urls.add(article['url'])  # 记录已展示
         else:
             # 如果没有高优先级，显示中优先级
             med_priority_investments = [
-                a for a in investment_articles if a.get("priority") == "中"
+                a for a in investment_articles
+                if a.get("priority") == "中" and a.get("url") not in displayed_urls
             ]
             if med_priority_investments:
                 for i, article in enumerate(med_priority_investments[:3], 1):
                     section += self._format_article(i, article)
+                    displayed_urls.add(article['url'])  # 记录已展示
             else:
                 section += "*本周暂无重点投资动态*\n"
 
@@ -159,99 +171,137 @@ class WeeklyReportGenerator:
         return section
 
     def _generate_technology_section(
-        self, by_category: Dict, by_priority: Dict
+        self, by_category: Dict, by_priority: Dict, displayed_urls: set
     ) -> str:
         """生成技术进展章节"""
-        section = "## 二、技术进展\n\n"
+        section = "## 三、技术进展\n\n"
 
-        # 获取技术类高优先级文章
-        tech_articles = by_category.get("技术", [])
-        high_priority_tech = [a for a in tech_articles if a.get("priority") == "高"]
+        # 获取技术类高优先级文章（支持多分类，如"技术,政策"）
+        tech_articles = []
+        for category, articles in by_category.items():
+            if "技术" in category:
+                tech_articles.extend(articles)
+
+        # 过滤已展示的文章
+        high_priority_tech = [
+            a for a in tech_articles
+            if a.get("priority") == "高" and a.get("url") not in displayed_urls
+        ]
 
         if high_priority_tech:
             for i, article in enumerate(high_priority_tech, 1):
                 section += self._format_article(i, article)
+                displayed_urls.add(article['url'])
         else:
             # 如果没有高优先级，显示中优先级
             med_priority_tech = [
-                a for a in tech_articles if a.get("priority") == "中"
+                a for a in tech_articles
+                if a.get("priority") == "中" and a.get("url") not in displayed_urls
             ]
             if med_priority_tech:
                 for i, article in enumerate(med_priority_tech[:3], 1):
                     section += self._format_article(i, article)
+                    displayed_urls.add(article['url'])
             else:
                 section += "*本周暂无重点技术进展*\n"
 
         section += "\n"
         return section
 
-    def _generate_policy_section(
-        self, by_category: Dict, by_priority: Dict
-    ) -> str:
+    def _generate_policy_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
         """生成政策法规章节"""
-        section = "## 三、政策法规\n\n"
+        section = "## 一、政策法规\n\n"
 
-        # 获取政策类文章
-        policy_articles = by_category.get("政策", [])
+        # 获取政策类文章（支持多分类，如"技术,政策"）
+        policy_articles = []
+        for category, articles in by_category.items():
+            if "政策" in category:
+                policy_articles.extend(articles)
+
+        # 过滤已展示的文章
         high_priority_policy = [
-            a for a in policy_articles if a.get("priority") == "高"
+            a for a in policy_articles
+            if a.get("priority") == "高" and a.get("url") not in displayed_urls
         ]
 
         if high_priority_policy:
             for i, article in enumerate(high_priority_policy, 1):
                 section += self._format_article(i, article)
+                displayed_urls.add(article['url'])
         else:
+            # 优先显示中优先级，再显示低优先级（政策内容重要，多展示）
             med_priority_policy = [
-                a for a in policy_articles if a.get("priority") == "中"
+                a for a in policy_articles
+                if a.get("priority") == "中" and a.get("url") not in displayed_urls
             ]
-            if med_priority_policy:
-                for i, article in enumerate(med_priority_policy[:3], 1):
+            low_priority_policy = [
+                a for a in policy_articles
+                if a.get("priority") == "低" and a.get("url") not in displayed_urls
+            ]
+
+            # 合并中低优先级，最多显示5篇政策
+            all_policy = med_priority_policy + low_priority_policy
+
+            if all_policy:
+                for i, article in enumerate(all_policy[:5], 1):
                     section += self._format_article(i, article)
+                    displayed_urls.add(article['url'])
             else:
                 section += "*本周暂无重点政策法规*\n"
 
         section += "\n"
         return section
 
-    def _generate_market_section(self, by_category: Dict, by_priority: Dict) -> str:
+    def _generate_market_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
         """生成市场动态章节"""
         section = "## 四、市场动态\n\n"
 
-        # 获取市场类文章
-        market_articles = by_category.get("市场", [])
+        # 获取市场类文章（支持多分类，如"技术,市场"）
+        market_articles = []
+        for category, articles in by_category.items():
+            if "市场" in category:
+                market_articles.extend(articles)
+
+        # 过滤已展示的文章
         high_priority_market = [
-            a for a in market_articles if a.get("priority") == "高"
+            a for a in market_articles
+            if a.get("priority") == "高" and a.get("url") not in displayed_urls
         ]
 
         if high_priority_market:
             for i, article in enumerate(high_priority_market, 1):
                 section += self._format_article(i, article)
+                displayed_urls.add(article['url'])
         else:
+            # 如果没有高优先级，显示中优先级
             med_priority_market = [
-                a for a in market_articles if a.get("priority") == "中"
+                a for a in market_articles
+                if a.get("priority") == "中" and a.get("url") not in displayed_urls
             ]
             if med_priority_market:
                 for i, article in enumerate(med_priority_market[:3], 1):
                     section += self._format_article(i, article)
+                    displayed_urls.add(article['url'])
             else:
                 section += "*本周暂无重点市场动态*\n"
 
         section += "\n"
         return section
 
-    def _generate_other_section(self, by_category: Dict, by_priority: Dict) -> str:
+    def _generate_other_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
         """生成其他动态章节"""
         section = "## 五、其他动态\n\n"
 
-        # 收集中低优先级的其他文章
+        # 收集中低优先级的其他文章（排除已详细展示的文章）
         all_categories = ["投资", "技术", "政策", "市场"]
         other_articles = []
 
-        # 收集所有中低优先级文章
+        # 收集所有中低优先级文章，排除已展示的
         for category in all_categories:
             articles = by_category.get(category, [])
             med_low_priority = [
-                a for a in articles if a.get("priority") in ["中", "低"]
+                a for a in articles
+                if a.get("priority") in ["中", "低"] and a['url'] not in displayed_urls
             ]
             other_articles.extend(med_low_priority)
 
