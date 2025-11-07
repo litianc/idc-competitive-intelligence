@@ -78,25 +78,19 @@
     },
     {
       "name": "数据中心世界",
-      "url": "https://www.dcworld.cn",
+      "url": "http://www.dcworld.cn",
       "tier": 1,
       "active": true,
       "description": "专注数据中心技术、运维、建设的专业媒体，深度报道行业技术进展和最佳实践",
       "scraper_config": {
-        "scraper_type": "basic",
-        "list_url": "https://www.dcworld.cn/news/",
+        "scraper_type": "generic",
+        "list_url": "http://www.dcworld.cn/",
         "encoding": "utf-8",
-        "article_selector": ".article-list .article-item",
-        "title_selector": "h3 a",
-        "link_selector": "h3 a",
-        "date_selector": ".publish-date",
-        "date_format": "%Y-%m-%d",
-        "date_patterns": [
-          "\\d{4}-\\d{2}-\\d{2}",
-          "\\d{4}年\\d{1,2}月\\d{1,2}日"
-        ],
-        "content_selector": ".content-body",
-        "request_delay": [2, 5]
+        "article_container": "li",
+        "title_selector": "a.index-news-mod",
+        "link_selector": "a.index-news-mod",
+        "date_selector": ".date, span.date",
+        "summary_selector": "p, .desc"
       }
     },
     {
@@ -106,20 +100,14 @@
       "active": true,
       "description": "通信行业综合媒体，覆盖IDC、云计算、5G、数据中心等领域，政策解读深入",
       "scraper_config": {
-        "scraper_type": "basic",
-        "list_url": "https://www.cww.net.cn/channel/datacenter/",
-        "encoding": "gbk",
-        "article_selector": ".news-list li",
-        "title_selector": "a",
-        "link_selector": "a",
-        "date_selector": ".date",
-        "date_format": "%Y-%m-%d",
-        "date_patterns": [
-          "\\d{4}-\\d{2}-\\d{2}",
-          "\\d{2}-\\d{2}"
-        ],
-        "content_selector": ".article-content",
-        "request_delay": [3, 6]
+        "scraper_type": "generic",
+        "list_url": "https://www.cww.net.cn/",
+        "encoding": "utf-8",
+        "article_container": "li",
+        "title_selector": "a[href*='/article']",
+        "link_selector": "a[href*='/article']",
+        "date_selector": ".time, .date, span.date",
+        "summary_selector": ".desc, p"
       }
     },
     {
@@ -144,7 +132,7 @@
       "name": "云头条",
       "url": "https://www.yuntoutiao.com",
       "tier": 1,
-      "active": false,
+      "active": true,
       "category": "数据中心/云计算",
       "description": "云计算资讯专业媒体，聚焦云计算、数据中心、IDC行业动态和政策解读",
       "scraper_config": {
@@ -205,36 +193,126 @@
         "scraper_type": "generic",
         "list_url": "https://www.ithome.com/",
         "encoding": "utf-8",
-        "article_container": "div",
-        "title_selector": "h2 a, h3 a, .title a",
+        "article_container": "ul.nl li.n, ul.nl li.t",
+        "title_selector": "a",
         "link_selector": "a",
-        "date_selector": ".time, .date",
-        "summary_selector": ".desc, .summary"
+        "date_selector": "b, i",
+        "summary_selector": "a"
+      }
+    },
+    {
+      "name": "国家数据局",
+      "url": "https://www.nda.gov.cn",
+      "tier": 1,
+      "active": true,
+      "category": "政策法规",
+      "description": "国家数据局官网，专职管理数据基础设施和算力网络，发布数据中心、东数西算等核心政策",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.nda.gov.cn/sjj/swdt/xwfb/list/index_pc_1.html",
+        "encoding": "utf-8",
+        "article_container": "ul.u-list li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span",
+        "summary_selector": ""
+      }
+    },
+    {
+      "name": "工业和信息化部",
+      "url": "https://www.miit.gov.cn",
+      "tier": 1,
+      "active": true,
+      "category": "政策法规",
+      "description": "工信部官网，IDC业务主管部门，发布数据中心许可、节能、新型数据中心建设等政策",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.miit.gov.cn/xwdt/gxdt/index.html",
+        "encoding": "utf-8",
+        "article_container": "li.cf",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span",
+        "summary_selector": ""
+      }
+    },
+    {
+      "name": "中国信通院",
+      "url": "https://www.caict.ac.cn",
+      "tier": 1,
+      "active": false,
+      "category": "政策法规",
+      "description": "中国信息通信研究院，工信部直属，发布数据中心白皮书、产业报告等权威研究成果（待优化URL和选择器）",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.caict.ac.cn/kxyj/qwfb/bps/",
+        "encoding": "utf-8",
+        "article_container": "li, div.list-item",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".date, span",
+        "summary_selector": "p, .desc"
+      }
+    },
+    {
+      "name": "ODCC",
+      "url": "https://www.odcc.org.cn",
+      "tier": 1,
+      "active": true,
+      "category": "政策法规",
+      "description": "开放数据中心委员会，发布数据中心技术标准、政策解读、绿色数据中心指南等专业内容",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.odcc.org.cn/news/15",
+        "encoding": "utf-8",
+        "article_container": "ul.ul-imgtxt-j li",
+        "title_selector": "h3",
+        "link_selector": "a",
+        "date_selector": "span",
+        "summary_selector": "p"
+      }
+    },
+    {
+      "name": "C114通信网",
+      "url": "https://www.c114.com.cn",
+      "tier": 2,
+      "active": false,
+      "category": "政策法规",
+      "description": "专业通信行业媒体，快速跟踪IDC、数据中心、云计算政策动态和行业新闻（待优化URL和选择器）",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.c114.com.cn/news/16.html",
+        "encoding": "gb2312",
+        "article_container": "li.item",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": ".date, span.time",
+        "summary_selector": "p"
       }
     },
     {
       "name": "驱动之家",
       "url": "https://www.mydrivers.com",
       "tier": 2,
-      "active": true,
+      "active": false,
       "category": "科技资讯",
       "description": "科技硬件资讯平台，关注IT硬件、数码产品和科技新闻",
       "scraper_config": {
         "scraper_type": "generic",
         "list_url": "https://www.mydrivers.com/",
         "encoding": "gbk",
-        "article_container": "li",
+        "article_container": "div.ct_txt",
         "title_selector": "a",
         "link_selector": "a",
-        "date_selector": ".time, span",
-        "summary_selector": ".desc"
+        "date_selector": "span.time, span",
+        "summary_selector": "p"
       }
     },
     {
       "name": "新浪科技",
       "url": "https://tech.sina.com.cn",
       "tier": 2,
-      "active": true,
+      "active": false,
       "category": "科技资讯",
       "description": "新浪科技频道，综合科技新闻和行业资讯",
       "scraper_config": {
@@ -252,7 +330,7 @@
       "name": "腾讯科技",
       "url": "https://tech.qq.com",
       "tier": 2,
-      "active": true,
+      "active": false,
       "category": "科技资讯",
       "description": "腾讯科技频道，覆盖互联网、通信、AI等领域",
       "scraper_config": {
@@ -270,7 +348,7 @@
       "name": "网易科技",
       "url": "https://tech.163.com",
       "tier": 2,
-      "active": true,
+      "active": false,
       "category": "科技资讯",
       "description": "网易科技频道，提供科技新闻和深度报道",
       "scraper_config": {
@@ -288,7 +366,7 @@
       "name": "搜狐科技",
       "url": "https://it.sohu.com",
       "tier": 2,
-      "active": true,
+      "active": false,
       "category": "科技资讯",
       "description": "搜狐科技频道，关注互联网和科技行业动态",
       "scraper_config": {
@@ -304,10 +382,12 @@
     }
   ],
   "metadata": {
-    "version": "1.0",
-    "last_updated": "2025-01-03",
-    "total_sources": 3,
+    "version": "1.1",
+    "last_updated": "2025-11-05",
+    "total_sources": 15,
+    "active_sources": 15,
     "notes": [
+      "2025-11-05: 新增5个政策权威数据源（国家数据局、工信部、中国信通院、ODCC、C114通信网）",
       "初始配置包含3个核心媒体源，用于MVP验证",
       "CSS选择器需要根据实际网站结构调整",
       "date_patterns支持多种日期格式的正则匹配",

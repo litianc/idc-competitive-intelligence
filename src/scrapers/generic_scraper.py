@@ -230,10 +230,10 @@ class GenericScraper:
                 dt = datetime.strptime(date_str.split()[0], "%Y-%m-%d")
                 return dt.date()
 
-            # Format without time: "2025-11-03" or "2025/11/03"
-            if re.match(r'\d{4}[-/]\d{2}[-/]\d{2}', date_str):
-                # Replace / with - for uniform parsing
-                normalized = date_str.replace('/', '-')
+            # Format without time: "2025-11-03" or "2025/11/03" or "2025.11.03"
+            if re.match(r'\d{4}[-/.]\d{2}[-/.]\d{2}', date_str):
+                # Replace / and . with - for uniform parsing
+                normalized = date_str.replace('/', '-').replace('.', '-')
                 dt = datetime.strptime(normalized, "%Y-%m-%d")
                 return dt.date()
 
