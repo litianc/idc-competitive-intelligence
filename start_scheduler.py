@@ -165,12 +165,18 @@ def main():
     logger.info("\n已添加的任务:")
     for job in scheduler.get_all_jobs():
         logger.info(f"  [{job.id}] {job.name}")
-        logger.info(f"    下次执行: {job.next_run_time}")
+        # Note: next_run_time只在调度器启动后才可用
 
     # 启动调度器
     logger.info("\n启动调度器...")
     scheduler.start()
     logger.info("✓ 调度器已启动，等待任务触发...")
+
+    # 显示下次执行时间（调度器启动后）
+    logger.info("\n任务执行时间:")
+    for job in scheduler.get_all_jobs():
+        logger.info(f"  [{job.id}] {job.name}")
+        logger.info(f"    下次执行: {job.next_run_time}")
 
     # 信号处理（优雅退出）
     def signal_handler(signum, frame):
