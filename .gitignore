@@ -120,6 +120,9 @@ logs/
 .idea/
 *.iml
 
+# Claude Code
+.claude/settings.local.json
+
 # Vim
 *.swp
 *.swo
