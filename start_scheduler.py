@@ -139,9 +139,9 @@ def main():
     logger.info(f"  每周周报: 每周{config['report_day']} {config['report_hour']:02d}:{config['report_minute']:02d}")
     logger.info(f"    - 统计天数: {config['report_days']}天")
 
-    # 创建调度器
+    # 创建调度器（使用内存存储避免序列化问题）
     scheduler = IntelligenceScheduler(
-        jobstore=config['jobstore'],
+        jobstore='memory',  # 使用内存存储
         timezone=config['timezone']
     )
 
