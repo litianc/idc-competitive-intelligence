@@ -77,8 +77,23 @@ data/*.db
 data/*.sqlite
 data/*.sqlite3
 
-# 临时数据库（保留测试数据库用于示例）
-# tmp/*.db
+# 临时文件和测试数据（保留有用的文件）
+tmp/*.db
+tmp/*.html
+tmp/*.json
+tmp/*.md
+tmp/*_test.py
+tmp/*_analysis.py
+tmp/*_demo.py
+tmp/debug_*.py
+tmp/analyze_*.py
+tmp/examine_*.py
+tmp/find_*.py
+tmp/test_*.py
+# 保留这些有用的文件
+!tmp/SQLITE_COMMANDS.md
+!tmp/test_email_report.py
+!tmp/test_email_v2.py
 
 # 生成的报告（可根据需求调整）
 reports/*.md
