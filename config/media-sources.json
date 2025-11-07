@@ -19,7 +19,6 @@
         "date_format": "%Y-%m-%d %H:%M:%S"
       }
     },
-
     {
       "name": "36氪",
       "url": "https://36kr.com",
@@ -38,7 +37,6 @@
         "summary_selector": "div.item-desc span"
       }
     },
-
     {
       "name": "InfoQ",
       "url": "https://www.infoq.cn",
@@ -57,7 +55,6 @@
         "summary_selector": "p.summary"
       }
     },
-
     {
       "name": "量子位",
       "url": "https://www.qbitai.com",
@@ -379,14 +376,87 @@
         "date_selector": ".time, .date",
         "summary_selector": ".desc"
       }
+    },
+    {
+      "name": "国家发展改革委",
+      "url": "https://www.ndrc.gov.cn",
+      "tier": 1,
+      "active": true,
+      "category": "政策法规",
+      "description": "国家发展改革委官网，发布东数西算、新基建、数字经济等核心政策，权威性极高",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.ndrc.gov.cn/xwdt/",
+        "encoding": "utf-8",
+        "article_container": "ul.u-list li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span",
+        "summary_selector": ""
+      }
+    },
+    {
+      "name": "国家能源局",
+      "url": "https://www.nea.gov.cn",
+      "tier": 1,
+      "active": true,
+      "category": "政策法规",
+      "description": "国家能源局官网，发布数据中心能耗政策、绿色数据中心标准、电力供应规划",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "https://www.nea.gov.cn/xwzx/",
+        "encoding": "utf-8",
+        "article_container": "ul.list01 li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span",
+        "summary_selector": ""
+      }
+    },
+    {
+      "name": "人民网-财经",
+      "url": "http://finance.people.com.cn",
+      "tier": 1,
+      "active": false,
+      "category": "财经资讯",
+      "description": "人民日报旗下权威财经媒体，报道IDC行业投资、并购、上市公司动态（超时问题待优化）",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://finance.people.com.cn/",
+        "encoding": "utf-8",
+        "article_container": "ul.list_14 li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "",
+        "summary_selector": ""
+      }
+    },
+    {
+      "name": "新华网-科技",
+      "url": "http://www.xinhuanet.com/tech",
+      "tier": 1,
+      "active": false,
+      "category": "科技资讯",
+      "description": "新华社旗下权威科技媒体，报道数字经济、AI算力、数据中心等前沿科技（超时问题待优化）",
+      "scraper_config": {
+        "scraper_type": "generic",
+        "list_url": "http://www.xinhuanet.com/tech/",
+        "encoding": "utf-8",
+        "article_container": "li.clearfix",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "",
+        "summary_selector": ""
+      }
     }
   ],
   "metadata": {
-    "version": "1.1",
-    "last_updated": "2025-11-05",
-    "total_sources": 15,
+    "version": "1.2",
+    "last_updated": "2025-11-07",
+    "total_sources": 25,
     "active_sources": 15,
     "notes": [
+      "2025-11-07: Phase 1新增4个权威数据源（国家发改委、国家能源局、人民网-财经、新华网-科技）",
       "2025-11-05: 新增5个政策权威数据源（国家数据局、工信部、中国信通院、ODCC、C114通信网）",
       "初始配置包含3个核心媒体源，用于MVP验证",
       "CSS选择器需要根据实际网站结构调整",

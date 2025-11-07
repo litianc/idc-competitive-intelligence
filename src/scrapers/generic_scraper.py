@@ -192,6 +192,10 @@ class GenericScraper:
                 date_str = date_elem.text.strip()
                 publish_date = self._parse_date(date_str)
 
+        # Fallback: Try to extract date from URL if not found in HTML
+        if not publish_date and url:
+            publish_date = self._extract_date_from_url(url)
+
         # Extract summary (optional)
         summary = ""
         if self.summary_selector:
@@ -230,7 +234,9 @@ class GenericScraper:
                 dt = datetime.strptime(date_str.split()[0], "%Y-%m-%d")
                 return dt.date()
 
-            # Format without time: "2025-11-03" or "2025/11/03" or "2025.11.03"
+            # Format without time: "2025-11-03" or "2025/11/03" or "2025.11.03" or "(2025-11-03)"
+            # Remove parentheses first
+            date_str = date_str.strip('()')
             if re.match(r'\d{4}[-/.]\d{2}[-/.]\d{2}', date_str):
                 # Replace / and . with - for uniform parsing
                 normalized = date_str.replace('/', '-').replace('.', '-')
@@ -297,6 +303,58 @@ class GenericScraper:
             pass
 
         logger.warning(f"Failed to parse date: {date_str}")
+        return None
+
+    def _extract_date_from_url(self, url: str) -> Optional[date]:
+        """
+        Extract date from URL path
+
+        Supports common URL patterns:
+        - /n1/2025/1107/xxx.html  -> 2025-11-07 (人民网)
+        - /tech/20251106/xxx.html -> 2025-11-06 (新华网)
+        - /202511/t20251103_xxx.html -> 2025-11-03 (国家发改委)
+        - /20251106/xxx.html -> 2025-11-06 (国家能源局)
+
+        Args:
+            url: Article URL
+
+        Returns:
+            date object or None if no date found in URL
+        """
+        if not url:
+            return None
+
+        try:
+            # Pattern 1: /YYYY/MMDD/ (e.g., /n1/2025/1107/)
+            match = re.search(r'/(\d{4})/(\d{4})/', url)
+            if match:
+                year = match.group(1)
+                mmdd = match.group(2)
+                month = mmdd[:2]
+                day = mmdd[2:]
+                return date(int(year), int(month), int(day))
+
+            # Pattern 2: /YYYYMMDD/ (e.g., /tech/20251106/)
+            match = re.search(r'/(\d{8})/', url)
+            if match:
+                date_str = match.group(1)
+                year = date_str[:4]
+                month = date_str[4:6]
+                day = date_str[6:8]
+                return date(int(year), int(month), int(day))
+
+            # Pattern 3: /YYYYMM/tYYYYMMDD_ (e.g., /202511/t20251103_)
+            match = re.search(r'/\d{6}/t(\d{8})', url)
+            if match:
+                date_str = match.group(1)
+                year = date_str[:4]
+                month = date_str[4:6]
+                day = date_str[6:8]
+                return date(int(year), int(month), int(day))
+
+        except Exception as e:
+            logger.debug(f"Failed to extract date from URL {url}: {e}")
+
         return None
 
     def _is_valid_article(self, article: Dict) -> bool:
