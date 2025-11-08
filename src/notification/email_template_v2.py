@@ -29,12 +29,14 @@ def parse_weekly_report(markdown_content: str) -> Dict:
         'title': '',
         'date': '',
         'week': '',
+        'executive_summary': '',  # 新增：整体总结
         'sections': [],
         'stats': {}
     }
 
     current_section = None
     current_article = None
+    in_executive_summary = False  # 新增：标记是否在读取整体总结
 
     for line in lines:
         line = line.strip()
@@ -52,15 +54,31 @@ def parse_weekly_report(markdown_content: str) -> Dict:
             if date_match:
                 result['date'] = date_match.group(1)
 
+        # 提取整体总结（本周概览）
+        elif line.startswith('## ') and '本周概览' in line:
+            in_executive_summary = True
+            current_section = None
+            current_article = None
+            continue
+
         # 提取章节
         elif line.startswith('## '):
+            in_executive_summary = False  # 结束整体总结
             section_title = line[3:].strip()
             current_section = {
                 'title': section_title,
+                'insight': '',  # 新增：板块点评
                 'articles': []
             }
             result['sections'].append(current_section)
             current_article = None
+
+        # 提取板块点评（如 **💡 趋势洞察**：xxx）
+        elif line.startswith('**') and '**：' in line and current_section and not current_article:
+            # 提取冒号后的内容作为点评
+            parts = line.split('**：', 1)
+            if len(parts) == 2:
+                current_section['insight'] = parts[1].strip()
 
         # 提取文章
         elif line.startswith('### ') and current_section:
@@ -103,8 +121,15 @@ def parse_weekly_report(markdown_content: str) -> Dict:
         # 提取摘要
         elif line and not line.startswith('#') and not line.startswith('**') and \
              not line.startswith('[') and not line.startswith('*') and \
-             not line.startswith('-') and current_article and not current_article['summary']:
-            current_article['summary'] = line
+             not line.startswith('-') and not line.startswith('---'):
+            if in_executive_summary:
+                # 追加到整体总结
+                if result['executive_summary']:
+                    result['executive_summary'] += ' ' + line
+                else:
+                    result['executive_summary'] = line
+            elif current_article and not current_article['summary']:
+                current_article['summary'] = line
 
         # 提取统计
         elif '总文章数' in line:
@@ -151,6 +176,18 @@ def generate_section_block_html(section: Dict) -> str:
             </h3>
             <div style="text-align: center; padding: 30px 0; color: #95a5a6;">
                 本周暂无相关动态
+            </div>
+        </div>
+        '''
+
+    # 板块点评HTML（如果有）
+    insight_html = ''
+    if section.get('insight'):
+        insight_html = f'''
+        <div style="background-color: {colors['light']}; border-left: 3px solid {colors['primary']};
+                    padding: 12px 15px; margin-bottom: 20px; border-radius: 5px;">
+            <div style="color: {colors['dark']}; font-size: 14px; font-style: italic; line-height: 1.6;">
+                {section['insight']}
             </div>
         </div>
         '''
@@ -224,6 +261,9 @@ def generate_section_block_html(section: Dict) -> str:
             </span>
         </div>
 
+        <!-- 板块点评 -->
+        {insight_html}
+
         <!-- 文章列表 -->
         <div>
             {articles_html}
@@ -232,6 +272,29 @@ def generate_section_block_html(section: Dict) -> str:
     '''
 
     return block_html
+
+
+def generate_executive_summary_html(summary: str) -> str:
+    """生成整体总结HTML"""
+    if not summary:
+        return ''
+
+    return f'''
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 12px; padding: 25px; margin: 20px 0;
+                color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+
+        <h3 style="margin: 0 0 15px 0; font-size: 20px; font-weight: 600;
+                   display: flex; align-items: center;">
+            <span style="font-size: 24px; margin-right: 8px;">📌</span>
+            本周概览
+        </h3>
+
+        <div style="font-size: 15px; line-height: 1.8; opacity: 0.95;">
+            {summary}
+        </div>
+    </div>
+    '''
 
 
 def generate_stats_dashboard(stats: Dict) -> str:
@@ -284,10 +347,13 @@ def generate_html_report(
     # 解析周报
     report_data = parse_weekly_report(markdown_content)
 
+    # 生成整体总结
+    executive_summary_html = generate_executive_summary_html(report_data.get('executive_summary', ''))
+
     # 生成各分类板块
     sections_html = ''
     for section in report_data['sections']:
-        if '统计' not in section['title']:
+        if '统计' not in section['title'] and '概览' not in section['title']:
             sections_html += generate_section_block_html(section)
 
     # 生成统计仪表板
@@ -320,6 +386,7 @@ def generate_html_report(
 
         <!-- 内容区 -->
         <div style="padding: 30px;">
+            {executive_summary_html}
             {sections_html}
             {stats_html}
         </div>

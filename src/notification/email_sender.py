@@ -9,6 +9,7 @@ import smtplib
 import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from email.header import Header
 from typing import List, Optional
 from pathlib import Path
@@ -73,19 +74,51 @@ class EmailSender:
         """
         try:
             # 创建邮件对象
-            message = MIMEMultipart('alternative')
+            # 如果有附件，使用 mixed；否则使用 alternative
+            message = MIMEMultipart('mixed' if attachments else 'alternative')
             message['From'] = Header(f"IDC竞争情报系统 <{self.smtp_user}>", 'utf-8')
-            message['To'] = Header(', '.join(recipients), 'utf-8')
+            # 收件人地址不要用Header包装，否则会显示异常后缀
+            message['To'] = ', '.join(recipients)
             message['Subject'] = Header(subject, 'utf-8')
 
             if cc:
-                message['Cc'] = Header(', '.join(cc), 'utf-8')
+                # 抄送地址也不要用Header包装
+                message['Cc'] = ', '.join(cc)
 
             # 添加HTML正文
             html_part = MIMEText(html_content, 'html', 'utf-8')
             message.attach(html_part)
 
-            # TODO: 添加附件支持（如果需要）
+            # 添加附件
+            if attachments:
+                for attachment_path in attachments:
+                    if not os.path.exists(attachment_path):
+                        logger.warning(f"  附件文件不存在，跳过: {attachment_path}")
+                        continue
+
+                    try:
+                        with open(attachment_path, 'rb') as f:
+                            attachment_data = f.read()
+
+                        # 创建附件对象
+                        attachment_part = MIMEApplication(attachment_data)
+
+                        # 设置附件文件名
+                        filename = os.path.basename(attachment_path)
+                        attachment_part.add_header(
+                            'Content-Disposition',
+                            'attachment',
+                            filename=('utf-8', '', filename)
+                        )
+
+                        message.attach(attachment_part)
+
+                        # 记录附件大小
+                        file_size_kb = len(attachment_data) / 1024
+                        logger.info(f"  附件已添加: {filename} ({file_size_kb:.1f} KB)")
+
+                    except Exception as e:
+                        logger.warning(f"  添加附件失败: {attachment_path}, 错误: {e}")
 
             # 连接SMTP服务器并发送
             all_recipients = recipients + (cc or [])
@@ -127,7 +160,9 @@ class EmailSender:
         report_content: str,
         recipients: List[str] = None,
         report_date: str = None,
-        use_block_layout: bool = True
+        use_block_layout: bool = True,
+        pdf_attachment: Optional[str] = None,
+        auto_generate_pdf: bool = None
     ) -> bool:
         """
         发送周报邮件（便捷方法）
@@ -136,6 +171,9 @@ class EmailSender:
             report_content: 周报内容（Markdown或HTML格式）
             recipients: 收件人列表（默认从环境变量读取）
             report_date: 报告日期（如"第45周"）
+            use_block_layout: 是否使用板块布局
+            pdf_attachment: PDF附件路径（如果已生成）
+            auto_generate_pdf: 是否自动生成PDF附件（None则从环境变量读取）
 
         Returns:
             是否发送成功
@@ -169,10 +207,41 @@ class EmailSender:
         else:
             html_content = report_content
 
+        # 处理PDF附件
+        attachments = []
+
+        if pdf_attachment and os.path.exists(pdf_attachment):
+            # 使用提供的PDF附件
+            attachments.append(pdf_attachment)
+            logger.info(f"使用已生成的PDF附件: {pdf_attachment}")
+
+        elif auto_generate_pdf or (auto_generate_pdf is None and os.getenv('PDF_ENABLED', 'true').lower() == 'true'):
+            # 自动生成PDF附件
+            try:
+                from src.reporting.pdf_generator import generate_weekly_report_pdf
+                import tempfile
+
+                # 在临时目录生成PDF
+                temp_dir = tempfile.gettempdir()
+                pdf_path = generate_weekly_report_pdf(
+                    html_content=html_content,
+                    output_dir=temp_dir
+                )
+
+                if pdf_path:
+                    attachments.append(pdf_path)
+                    logger.info(f"已自动生成PDF附件: {pdf_path}")
+                else:
+                    logger.warning("PDF自动生成失败，将发送不带附件的邮件")
+
+            except Exception as e:
+                logger.warning(f"PDF自动生成失败: {e}，将发送不带附件的邮件")
+
         return self.send_html_email(
             subject=subject,
             html_content=html_content,
-            recipients=recipients
+            recipients=recipients,
+            attachments=attachments if attachments else None
         )
 
     @classmethod

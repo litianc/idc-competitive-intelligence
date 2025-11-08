@@ -7,7 +7,13 @@
 from datetime import date, timedelta
 from typing import List, Dict, Optional
 from src.storage.database import Database
+from src.reporting.report_summarizer import (
+    WeeklyReportSummarizer,
+    get_random_insight_label,
+    get_insight_icon
+)
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -15,18 +21,42 @@ logger = logging.getLogger(__name__)
 class WeeklyReportGenerator:
     """周报生成器"""
 
-    def __init__(self, database: Optional[Database] = None, db_path: str = "data/intelligence.db"):
+    def __init__(
+        self,
+        database: Optional[Database] = None,
+        db_path: str = "data/intelligence.db",
+        enable_llm_summary: Optional[bool] = None
+    ):
         """
         初始化周报生成器
 
         Args:
             database: 数据库实例（可选，用于测试）
             db_path: 数据库文件路径
+            enable_llm_summary: 是否启用LLM摘要（None则从环境变量读取）
         """
         if database:
             self.db = database
         else:
             self.db = Database(db_path)
+
+        # LLM摘要配置
+        if enable_llm_summary is None:
+            self.enable_llm_summary = os.getenv('WEEKLY_SUMMARY_ENABLED', 'true').lower() == 'true'
+        else:
+            self.enable_llm_summary = enable_llm_summary
+
+        self.use_random_labels = os.getenv('WEEKLY_INSIGHT_LABEL_RANDOM', 'true').lower() == 'true'
+
+        # 初始化摘要生成器
+        if self.enable_llm_summary:
+            try:
+                self.summarizer = WeeklyReportSummarizer.from_env()
+            except Exception as e:
+                logger.warning(f"LLM摘要生成器初始化失败: {e}，将使用默认摘要")
+                self.summarizer = None
+        else:
+            self.summarizer = None
 
     def get_articles_for_report(self, days: int = 7) -> List[Dict]:
         """
@@ -98,18 +128,50 @@ class WeeklyReportGenerator:
         by_category = self.group_by_category(articles)
         by_priority = self.group_by_priority(articles)
 
+        # 生成LLM摘要和板块点评
+        insights = {}
+        if self.enable_llm_summary and self.summarizer:
+            try:
+                insights = self.summarizer.generate_insights(articles, by_category)
+                logger.info("✓ LLM摘要生成成功")
+            except Exception as e:
+                logger.warning(f"LLM摘要生成失败: {e}，使用默认摘要")
+                insights = self.summarizer._get_default_insights(articles, by_category) if self.summarizer else {}
+
         # 生成报告
         report = self._generate_header()
+
+        # 添加整体总结
+        if insights.get('executive_summary'):
+            report += self._format_executive_summary(insights['executive_summary'])
 
         # 跟踪已展示的文章URL（避免重复）
         displayed_urls = set()
 
+        # 获取板块点评
+        section_insights = insights.get('section_insights', {})
+
         # 生成各个章节（政策章节优先，避免被其他章节消费）
-        report += self._generate_policy_section(by_category, by_priority, displayed_urls)
-        report += self._generate_investment_section(by_category, by_priority, displayed_urls)
-        report += self._generate_technology_section(by_category, by_priority, displayed_urls)
-        report += self._generate_market_section(by_category, by_priority, displayed_urls)
-        report += self._generate_other_section(by_category, by_priority, displayed_urls)
+        report += self._generate_policy_section(
+            by_category, by_priority, displayed_urls,
+            insight=section_insights.get('政策法规', '')
+        )
+        report += self._generate_investment_section(
+            by_category, by_priority, displayed_urls,
+            insight=section_insights.get('投资动态', '')
+        )
+        report += self._generate_technology_section(
+            by_category, by_priority, displayed_urls,
+            insight=section_insights.get('技术进展', '')
+        )
+        report += self._generate_market_section(
+            by_category, by_priority, displayed_urls,
+            insight=section_insights.get('市场动态', '')
+        )
+        report += self._generate_other_section(
+            by_category, by_priority, displayed_urls,
+            insight=section_insights.get('其他动态', '')
+        )
 
         # 生成统计信息
         report += self._generate_statistics(articles)
@@ -132,11 +194,27 @@ class WeeklyReportGenerator:
 """
         return header
 
+    def _format_executive_summary(self, summary: str) -> str:
+        """格式化整体总结"""
+        return f"""## 📌 本周概览
+
+{summary}
+
+---
+
+"""
+
     def _generate_investment_section(
-        self, by_category: Dict, by_priority: Dict, displayed_urls: set
+        self, by_category: Dict, by_priority: Dict, displayed_urls: set, insight: str = ""
     ) -> str:
         """生成投资动态章节"""
         section = "## 二、投资动态\n\n"
+
+        # 添加板块点评
+        if insight:
+            label = get_random_insight_label('投资动态', self.use_random_labels)
+            icon = get_insight_icon(label)
+            section += f"**{icon} {label}**：{insight}\n\n"
 
         # 获取投资类高优先级文章（支持多分类，如"投资,技术"）
         investment_articles = []
@@ -171,10 +249,16 @@ class WeeklyReportGenerator:
         return section
 
     def _generate_technology_section(
-        self, by_category: Dict, by_priority: Dict, displayed_urls: set
+        self, by_category: Dict, by_priority: Dict, displayed_urls: set, insight: str = ""
     ) -> str:
         """生成技术进展章节"""
         section = "## 三、技术进展\n\n"
+
+        # 添加板块点评
+        if insight:
+            label = get_random_insight_label('技术进展', self.use_random_labels)
+            icon = get_insight_icon(label)
+            section += f"**{icon} {label}**：{insight}\n\n"
 
         # 获取技术类高优先级文章（支持多分类，如"技术,政策"）
         tech_articles = []
@@ -208,9 +292,15 @@ class WeeklyReportGenerator:
         section += "\n"
         return section
 
-    def _generate_policy_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
+    def _generate_policy_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set, insight: str = "") -> str:
         """生成政策法规章节"""
         section = "## 一、政策法规\n\n"
+
+        # 添加板块点评
+        if insight:
+            label = get_random_insight_label('政策法规', self.use_random_labels)
+            icon = get_insight_icon(label)
+            section += f"**{icon} {label}**：{insight}\n\n"
 
         # 获取政策类文章（支持多分类，如"技术,政策"）
         policy_articles = []
@@ -252,9 +342,15 @@ class WeeklyReportGenerator:
         section += "\n"
         return section
 
-    def _generate_market_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
+    def _generate_market_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set, insight: str = "") -> str:
         """生成市场动态章节"""
         section = "## 四、市场动态\n\n"
+
+        # 添加板块点评
+        if insight:
+            label = get_random_insight_label('市场动态', self.use_random_labels)
+            icon = get_insight_icon(label)
+            section += f"**{icon} {label}**：{insight}\n\n"
 
         # 获取市场类文章（支持多分类，如"技术,市场"）
         market_articles = []
@@ -288,9 +384,15 @@ class WeeklyReportGenerator:
         section += "\n"
         return section
 
-    def _generate_other_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set) -> str:
+    def _generate_other_section(self, by_category: Dict, by_priority: Dict, displayed_urls: set, insight: str = "") -> str:
         """生成其他动态章节"""
         section = "## 五、其他动态\n\n"
+
+        # 添加板块点评
+        if insight:
+            label = get_random_insight_label('其他动态', self.use_random_labels)
+            icon = get_insight_icon(label)
+            section += f"**{icon} {label}**：{insight}\n\n"
 
         # 收集中低优先级的其他文章（排除已详细展示的文章）
         all_categories = ["投资", "技术", "政策", "市场"]
@@ -388,26 +490,87 @@ class WeeklyReportGenerator:
             today=date.today().strftime("%Y年%m月%d日")
         )
 
-    def generate_and_save(self, output_path: str, days: int = 7) -> bool:
+    def generate_and_save(
+        self,
+        output_path: str,
+        days: int = 7,
+        generate_html: bool = True,
+        generate_pdf: bool = None
+    ) -> Dict[str, Optional[str]]:
         """
         生成周报并保存到文件
 
         Args:
-            output_path: 输出文件路径
+            output_path: Markdown输出文件路径
             days: 统计天数
+            generate_html: 是否生成HTML文件
+            generate_pdf: 是否生成PDF文件（None则从环境变量读取）
 
         Returns:
-            是否成功
+            生成的文件路径字典 {
+                'markdown': 'path/to/report.md',
+                'html': 'path/to/report.html' or None,
+                'pdf': 'path/to/report.pdf' or None
+            }
         """
+        result = {
+            'markdown': None,
+            'html': None,
+            'pdf': None
+        }
+
         try:
+            # 生成Markdown周报
             report = self.generate_report(days=days)
 
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(report)
 
-            logger.info(f"周报已保存到: {output_path}")
-            return True
+            result['markdown'] = output_path
+            logger.info(f"✓ Markdown周报已保存: {output_path}")
+
+            # 生成HTML文件
+            if generate_html:
+                html_path = output_path.replace('.md', '.html')
+                try:
+                    from src.notification.email_template_v2 import generate_html_report
+
+                    html_content = generate_html_report(report)
+
+                    with open(html_path, "w", encoding="utf-8") as f:
+                        f.write(html_content)
+
+                    result['html'] = html_path
+                    logger.info(f"✓ HTML周报已保存: {html_path}")
+
+                    # 生成PDF文件
+                    if generate_pdf is None:
+                        generate_pdf = os.getenv('PDF_ENABLED', 'true').lower() == 'true'
+
+                    if generate_pdf:
+                        try:
+                            from src.reporting.pdf_generator import generate_weekly_report_pdf
+
+                            output_dir = os.path.dirname(output_path) or "reports"
+                            pdf_path = generate_weekly_report_pdf(
+                                html_content=html_content,
+                                output_dir=output_dir
+                            )
+
+                            if pdf_path:
+                                result['pdf'] = pdf_path
+                                logger.info(f"✓ PDF周报已保存: {pdf_path}")
+                            else:
+                                logger.warning("PDF生成失败，但周报生成流程继续")
+
+                        except Exception as e:
+                            logger.warning(f"PDF生成失败: {e}，但周报生成流程继续")
+
+                except Exception as e:
+                    logger.warning(f"HTML生成失败: {e}，但周报生成流程继续")
+
+            return result
 
         except Exception as e:
             logger.error(f"保存周报失败: {e}")
-            return False
+            return result

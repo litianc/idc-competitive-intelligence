@@ -3,8 +3,10 @@
 IDC行业竞争情报系统 - 周报生成脚本
 
 使用方法:
-    python3 generate_weekly_report.py           # 生成最近7天的周报
-    python3 generate_weekly_report.py --days 14 # 生成最近14天的周报
+    python3 generate_weekly_report.py                    # 生成最近7天的周报
+    python3 generate_weekly_report.py --days 14          # 生成最近14天的周报
+    python3 generate_weekly_report.py --send-email       # 生成并发送邮件
+    python3 generate_weekly_report.py --no-pdf           # 不生成PDF
 """
 
 import argparse
@@ -14,18 +16,10 @@ from pathlib import Path
 
 from src.storage.database import Database
 from src.reporting.report_generator import WeeklyReportGenerator
+from dotenv import load_dotenv
 
 # 加载环境变量
-def load_env_file(env_path: str = '.env'):
-    """加载.env文件中的环境变量"""
-    env_file = Path(env_path)
-    if env_file.exists():
-        with open(env_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
-                    os.environ[key.strip()] = value.strip()
+load_dotenv()
 
 
 def main():
@@ -36,16 +30,17 @@ def main():
     parser.add_argument('--db', type=str, default='data/intelligence.db',
                        help='数据库文件路径')
     parser.add_argument('--output', type=str, default=None,
-                       help='输出文件路径（默认: reports/IDC_Weekly_Report_YYYY_MM_DD.md）')
+                       help='输出文件路径（默认: reports/weekly_report.md）')
     parser.add_argument('--send-email', action='store_true',
                        help='生成周报后自动发送邮件')
     parser.add_argument('--email-only', action='store_true',
                        help='仅发送邮件，不保存文件')
+    parser.add_argument('--no-pdf', action='store_true',
+                       help='不生成PDF文件')
+    parser.add_argument('--no-llm', action='store_true',
+                       help='不使用LLM生成摘要')
 
     args = parser.parse_args()
-
-    # 加载环境变量
-    load_env_file()
 
     print("="*80)
     print("IDC行业竞争情报系统 - 周报生成")
@@ -78,8 +73,11 @@ def main():
     print(f"开始生成周报（统计最近 {args.days} 天）...")
     print("="*80)
 
-    generator = WeeklyReportGenerator(database=db)
-    report_content = generator.generate_report(days=args.days)
+    # 创建生成器（控制LLM摘要）
+    generator = WeeklyReportGenerator(
+        database=db,
+        enable_llm_summary=not args.no_llm
+    )
 
     # 确定输出路径
     if args.output:
@@ -88,16 +86,38 @@ def main():
         # 默认保存到 reports 目录
         reports_dir = Path('reports')
         reports_dir.mkdir(exist_ok=True)
-        output_file = reports_dir / f"IDC_Weekly_Report_{date.today().strftime('%Y_%m_%d')}.md"
+        output_file = reports_dir / "weekly_report.md"
 
     # 保存报告（除非仅发送邮件）
     if not args.email_only:
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(report_content)
+        # 使用新的generate_and_save方法（支持HTML和PDF）
+        result = generator.generate_and_save(
+            output_path=str(output_file),
+            days=args.days,
+            generate_html=True,
+            generate_pdf=not args.no_pdf
+        )
 
         print(f"\n✓ 周报已生成!")
-        print(f"✓ 文件路径: {output_file}")
-        print(f"✓ 报告长度: {len(report_content)} 字符")
+        print(f"✓ Markdown: {result['markdown']}")
+        if result['html']:
+            print(f"✓ HTML:     {result['html']}")
+        if result['pdf']:
+            pdf_size = os.path.getsize(result['pdf']) / 1024
+            print(f"✓ PDF:      {result['pdf']} ({pdf_size:.1f} KB)")
+        elif not args.no_pdf:
+            print(f"⚠️  PDF生成失败（但不影响其他文件）")
+
+        # 读取报告内容（用于预览和邮件）
+        with open(result['markdown'], 'r', encoding='utf-8') as f:
+            report_content = f.read()
+
+        # 保存PDF路径供后续使用
+        pdf_file = result.get('pdf')
+    else:
+        # 仅发送邮件模式，直接生成内容
+        report_content = generator.generate_report(days=args.days)
+        pdf_file = None
 
     # 显示简要预览
     lines = report_content.split('\n')
@@ -122,20 +142,26 @@ def main():
             # 创建邮件发送器
             sender = EmailSender.from_env()
 
-            # 发送周报邮件（使用板块布局）
+            # 发送周报邮件（使用板块布局，附加PDF）
             success = sender.send_weekly_report(
                 report_content=report_content,
-                use_block_layout=True  # 使用板块布局
+                use_block_layout=True,  # 使用板块布局
+                pdf_attachment=pdf_file if not args.email_only else None,  # 使用已生成的PDF
+                auto_generate_pdf=args.email_only and not args.no_pdf  # email_only模式下自动生成PDF
             )
 
             if success:
                 print("\n✓ 邮件发送成功！")
                 print(f"✓ 收件人: {os.getenv('EMAIL_RECIPIENTS', 'li.xiaoyu@vnet.com')}")
+                if pdf_file or (args.email_only and not args.no_pdf):
+                    print(f"✓ 已附加PDF文件")
             else:
                 print("\n✗ 邮件发送失败！请检查邮箱配置。")
 
         except Exception as e:
             print(f"\n✗ 邮件发送异常: {e}")
+            import traceback
+            traceback.print_exc()
 
     db.close()
 
