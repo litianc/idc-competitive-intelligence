@@ -77,6 +77,11 @@ data/*.db
 data/*.sqlite
 data/*.sqlite3
 
+# 数据库备份文件
+data/*.backup
+data/*.db.backup*
+data/*.bak
+
 # 临时文件和测试数据（保留有用的文件）
 tmp/*.db
 tmp/*.html
@@ -121,7 +126,10 @@ logs/
 *.iml
 
 # Claude Code
-.claude/settings.local.json
+.claude/
+.claude/*
+!.claude/settings.json
+!.claude/commands/
 
 # Vim
 *.swp
