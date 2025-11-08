@@ -141,7 +141,7 @@ class WeeklyReportGenerator:
         # 获取投资类高优先级文章（支持多分类，如"投资,技术"）
         investment_articles = []
         for category, articles in by_category.items():
-            if "投资" in category:
+            if category and "投资" in category:
                 investment_articles.extend(articles)
 
         # 过滤已展示的文章
@@ -179,7 +179,7 @@ class WeeklyReportGenerator:
         # 获取技术类高优先级文章（支持多分类，如"技术,政策"）
         tech_articles = []
         for category, articles in by_category.items():
-            if "技术" in category:
+            if category and "技术" in category:
                 tech_articles.extend(articles)
 
         # 过滤已展示的文章
@@ -215,7 +215,7 @@ class WeeklyReportGenerator:
         # 获取政策类文章（支持多分类，如"技术,政策"）
         policy_articles = []
         for category, articles in by_category.items():
-            if "政策" in category:
+            if category and "政策" in category:
                 policy_articles.extend(articles)
 
         # 过滤已展示的文章
@@ -259,7 +259,7 @@ class WeeklyReportGenerator:
         # 获取市场类文章（支持多分类，如"技术,市场"）
         market_articles = []
         for category, articles in by_category.items():
-            if "市场" in category:
+            if category and "市场" in category:
                 market_articles.extend(articles)
 
         # 过滤已展示的文章

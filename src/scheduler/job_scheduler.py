@@ -64,7 +64,7 @@ def generate_weekly_report(days: int = 7):
     import subprocess
     import sys
 
-    cmd = [sys.executable, 'generate_weekly_report.py', '--days', str(days)]
+    cmd = [sys.executable, 'generate_weekly_report.py', '--days', str(days), '--send-email']
 
     try:
         logger.info(f"开始生成周报: {' '.join(cmd)}")

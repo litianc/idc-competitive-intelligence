@@ -10,6 +10,7 @@ from datetime import datetime, date
 from typing import List, Dict, Optional
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
+from urllib.parse import urljoin
 import logging
 import re
 import json
@@ -180,9 +181,10 @@ class GenericScraper:
             link_elem = container.select_one(self.link_selector)
             if link_elem:
                 url = link_elem.get("href", "").strip()
-                # Convert relative URL to absolute
-                if url and not url.startswith("http"):
-                    url = self.base_url.rstrip("/") + "/" + url.lstrip("/")
+                # Convert relative URL to absolute using urljoin (handles ./, ../, / correctly)
+                # Use list_url as base because relative links are relative to the page they're on
+                if url:
+                    url = urljoin(self.list_url, url)
 
         # Extract date
         publish_date = None
@@ -228,8 +230,9 @@ class GenericScraper:
             # Clean up the string
             date_str = date_str.strip()
 
-            # Try primary format
-            if " " in date_str and "-" in date_str:
+            # Try primary format with year: "2025-11-03 18:02:21"
+            # Only match if starts with 4 digits (year)
+            if re.match(r'\d{4}', date_str) and " " in date_str and "-" in date_str:
                 # Format with time: "2025-11-03 18:02:21"
                 dt = datetime.strptime(date_str.split()[0], "%Y-%m-%d")
                 return dt.date()
@@ -282,8 +285,10 @@ class GenericScraper:
             if '前天' in date_str:
                 return date.today() - timedelta(days=2)
 
-            # Short date format: "10-31" (assume current year)
-            match = re.match(r'(\d{1,2})-(\d{1,2})$', date_str)
+            # Short date format: "10-31" or "11 - 05" (assume current year)
+            # Remove all whitespace (including Unicode spaces) for matching
+            date_str_no_space = re.sub(r'\s+', '', date_str)
+            match = re.match(r'(\d{1,2})-(\d{1,2})$', date_str_no_space)
             if match:
                 month, day = match.groups()
                 current_year = date.today().year
@@ -292,6 +297,11 @@ class GenericScraper:
                 except ValueError:
                     # Invalid date (e.g., 02-30), return None
                     pass
+
+            # Time only format: "17 : 50" or "17:50" (assume today)
+            # date_str_no_space already computed above
+            if re.match(r'^\d{1,2}:\d{2}$', date_str_no_space):
+                return date.today()
 
             # Chinese format: "2025年11月3日"
             match = re.search(r'(\d{4})年(\d{1,2})月(\d{1,2})日', date_str)
@@ -314,6 +324,7 @@ class GenericScraper:
         - /tech/20251106/xxx.html -> 2025-11-06 (新华网)
         - /202511/t20251103_xxx.html -> 2025-11-03 (国家发改委)
         - /20251106/xxx.html -> 2025-11-06 (国家能源局)
+        - /2025-11-07/xxx.shtml -> 2025-11-07 (TechWeb)
 
         Args:
             url: Article URL
@@ -325,7 +336,15 @@ class GenericScraper:
             return None
 
         try:
-            # Pattern 1: /YYYY/MMDD/ (e.g., /n1/2025/1107/)
+            # Pattern 1: /YYYY-MM-DD/ (e.g., /2025-11-07/)
+            match = re.search(r'/(\d{4})-(\d{2})-(\d{2})/', url)
+            if match:
+                year = int(match.group(1))
+                month = int(match.group(2))
+                day = int(match.group(3))
+                return date(year, month, day)
+
+            # Pattern 2: /YYYY/MMDD/ (e.g., /n1/2025/1107/)
             match = re.search(r'/(\d{4})/(\d{4})/', url)
             if match:
                 year = match.group(1)
@@ -334,7 +353,7 @@ class GenericScraper:
                 day = mmdd[2:]
                 return date(int(year), int(month), int(day))
 
-            # Pattern 2: /YYYYMMDD/ (e.g., /tech/20251106/)
+            # Pattern 3: /YYYYMMDD/ (e.g., /tech/20251106/)
             match = re.search(r'/(\d{8})/', url)
             if match:
                 date_str = match.group(1)
@@ -343,7 +362,7 @@ class GenericScraper:
                 day = date_str[6:8]
                 return date(int(year), int(month), int(day))
 
-            # Pattern 3: /YYYYMM/tYYYYMMDD_ (e.g., /202511/t20251103_)
+            # Pattern 4: /YYYYMM/tYYYYMMDD_ (e.g., /202511/t20251103_)
             match = re.search(r'/\d{6}/t(\d{8})', url)
             if match:
                 date_str = match.group(1)
@@ -387,7 +406,8 @@ class ScraperFactory:
 
     # Mapping of sources that need custom scrapers
     CUSTOM_SCRAPERS = {
-        "中国IDC圈": "idcquan_scraper.IdcquanScraper"
+        "中国IDC圈": "idcquan_scraper.IdcquanScraper",
+        "通信世界网": "cww_scraper.CwwScraper"
     }
 
     @classmethod

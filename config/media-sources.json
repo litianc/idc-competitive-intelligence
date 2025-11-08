@@ -98,13 +98,13 @@
       "description": "通信行业综合媒体，覆盖IDC、云计算、5G、数据中心等领域，政策解读深入",
       "scraper_config": {
         "scraper_type": "generic",
-        "list_url": "https://www.cww.net.cn/",
+        "list_url": "https://www.cww.net.cn/subjects/nav/rollList/8102",
         "encoding": "utf-8",
-        "article_container": "li",
-        "title_selector": "a[href*='/article']",
-        "link_selector": "a[href*='/article']",
-        "date_selector": ".time, .date, span.date",
-        "summary_selector": ".desc, p"
+        "article_container": "div.pindao.mt0 li",
+        "title_selector": "a",
+        "link_selector": "a",
+        "date_selector": "span.textgray.fr",
+        "summary_selector": ""
       }
     },
     {
@@ -157,7 +157,7 @@
         "article_container": "div.news_title",
         "title_selector": "a",
         "link_selector": "a",
-        "date_selector": "span.time",
+        "date_selector": "",
         "summary_selector": "div.news_content"
       }
     },
@@ -265,7 +265,7 @@
         "article_container": "ul.ul-imgtxt-j li",
         "title_selector": "h3",
         "link_selector": "a",
-        "date_selector": "span",
+        "date_selector": "p.date",
         "summary_selector": "p"
       }
     },
